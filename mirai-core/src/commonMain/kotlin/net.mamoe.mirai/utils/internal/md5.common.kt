@@ -1,18 +1,19 @@
+/*
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
+ *
+ * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
+ *
+ * https://github.com/mamoe/mirai/blob/master/LICENSE
+ */
+
 @file:Suppress("EXPERIMENTAL_API_USAGE", "unused")
 
 package net.mamoe.mirai.utils.internal
 
 import kotlinx.io.pool.DefaultPool
 import kotlinx.io.pool.ObjectPool
-
-internal expect abstract class InputStream {
-    open fun available(): Int
-    open fun close()
-    abstract fun read(): Int
-    open fun read(b: ByteArray): Int
-    open fun read(b: ByteArray, offset: Int, len: Int): Int
-    open fun skip(n: Long): Long
-}
+import java.io.InputStream
 
 internal expect fun InputStream.md5(): ByteArray
 internal expect fun ByteArray.md5(offset: Int = 0, length: Int = this.size - offset): ByteArray

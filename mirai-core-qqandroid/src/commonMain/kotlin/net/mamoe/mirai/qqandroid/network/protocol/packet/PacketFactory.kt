@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -13,13 +13,11 @@ import kotlinx.io.core.*
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.qqandroid.QQAndroidBot
 import net.mamoe.mirai.qqandroid.network.Packet
-import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.MultiMsg
-import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.NewContact
-import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.PbMessageSvc
-import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.TroopManagement
+import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.*
 import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.image.ImgStore
 import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.image.LongConn
 import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.receive.*
+import net.mamoe.mirai.qqandroid.network.protocol.packet.chat.voice.PttStore
 import net.mamoe.mirai.qqandroid.network.protocol.packet.list.FriendList
 import net.mamoe.mirai.qqandroid.network.protocol.packet.list.ProfileService
 import net.mamoe.mirai.qqandroid.network.protocol.packet.login.ConfigPushSvc
@@ -36,6 +34,7 @@ import net.mamoe.mirai.qqandroid.utils.io.useBytes
 import net.mamoe.mirai.qqandroid.utils.io.withUse
 import net.mamoe.mirai.utils.*
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmOverloads
 
 internal sealed class PacketFactory<TPacket : Packet?> {
     /**
@@ -139,14 +138,17 @@ internal object KnownPacketFactories {
         FriendList.GetTroopListSimplify,
         FriendList.GetTroopMemberList,
         ImgStore.GroupPicUp,
+        PttStore.GroupPttUp,
+        PttStore.GroupPttDown,
         LongConn.OffPicUp,
         LongConn.OffPicDown,
         TroopManagement.EditSpecialTitle,
         TroopManagement.Mute,
         TroopManagement.GroupOperation,
-        TroopManagement.GetGroupInfo,
+        //  TroopManagement.GetGroupInfo,
         TroopManagement.EditGroupNametag,
         TroopManagement.Kick,
+        NudgePacket,
         Heartbeat.Alive,
         PbMessageSvc.PbMsgWithDraw,
         MultiMsg.ApplyUp,
@@ -172,6 +174,11 @@ internal object KnownPacketFactories {
         return OutgoingFactories.firstOrNull { it.receivingCommandName == commandName }
             ?: IncomingFactories.firstOrNull { it.receivingCommandName == commandName }
     }
+
+    class PacketFactoryIllegalState10008Exception @JvmOverloads constructor(
+        override val message: String? = null,
+        override val cause: Throwable? = null
+    ) : RuntimeException()
 
     // do not inline. Exceptions thrown will not be reported correctly
     @Suppress("UNCHECKED_CAST")
@@ -244,11 +251,13 @@ internal object KnownPacketFactories {
             bot.network.logger.debug { "Received unknown commandName: ${it.commandName}" }
             PacketLogger.warning { "找不到 PacketFactory" }
             PacketLogger.verbose {
-                "传递给 PacketFactory 的数据 = ${it.data.useBytes { data, length ->
-                    data.toUHexString(
-                        length = length
-                    )
-                }}"
+                "传递给 PacketFactory 的数据 = ${
+                    it.data.useBytes { data, length ->
+                        data.toUHexString(
+                            length = length
+                        )
+                    }
+                }"
             }
             return
         }
@@ -301,8 +310,14 @@ internal object KnownPacketFactories {
         input.readPacketExact(input.readInt() - 4).withUse {
             ssoSequenceId = readInt()
             PacketLogger.verbose { "sequenceId = $ssoSequenceId" }
+
             val returnCode = readInt()
-            check(returnCode == 0) { "returnCode = $returnCode" }
+            check(returnCode == 0) {
+                if (returnCode == -10008) { // https://github.com/mamoe/mirai/issues/470
+                    throw PacketFactoryIllegalState10008Exception("returnCode = $returnCode")
+                } else "returnCode = $returnCode"
+            }
+
             if (PacketLogger.isEnabled) {
                 val extraData = readBytes(readInt() - 4)
                 PacketLogger.verbose { "(sso/inner)extraData = ${extraData.toUHexString()}" }

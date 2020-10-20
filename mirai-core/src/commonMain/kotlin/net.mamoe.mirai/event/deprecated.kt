@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -55,7 +55,7 @@ import kotlin.jvm.JvmName
     level = DeprecationLevel.HIDDEN
 )
 @kotlin.internal.LowPriorityInOverloadResolution
-fun <R> Bot.subscribeMessages(
+public fun <R> Bot.subscribeMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     priority: Listener.EventPriority = EventPriority.MONITOR,
@@ -80,7 +80,7 @@ fun <R> Bot.subscribeMessages(
     "Deprecated for better Coroutine life cycle management. Please filter bot instance on your own.",
     level = DeprecationLevel.HIDDEN
 )
-fun <R> Bot.subscribeGroupMessages(
+public fun <R> Bot.subscribeGroupMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     priority: Listener.EventPriority = EventPriority.MONITOR,
@@ -105,7 +105,7 @@ fun <R> Bot.subscribeGroupMessages(
     "Deprecated for better Coroutine life cycle management. Please filter bot instance on your own.",
     level = DeprecationLevel.HIDDEN
 )
-fun <R> Bot.subscribeFriendMessages(
+public fun <R> Bot.subscribeFriendMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     priority: Listener.EventPriority = EventPriority.MONITOR,
@@ -131,7 +131,7 @@ fun <R> Bot.subscribeFriendMessages(
     "Deprecated for better Coroutine life cycle management. Please filter bot instance on your own.",
     level = DeprecationLevel.HIDDEN
 )
-fun <R> Bot.subscribeTempMessages(
+public fun <R> Bot.subscribeTempMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     priority: Listener.EventPriority = EventPriority.MONITOR,
@@ -156,7 +156,7 @@ fun <R> Bot.subscribeTempMessages(
     "Deprecated for better Coroutine life cycle management. Please filter bot instance on your own.",
     level = DeprecationLevel.HIDDEN
 )
-inline fun <reified E : BotEvent> Bot.incoming(
+public inline fun <reified E : BotEvent> Bot.incoming(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     priority: Listener.EventPriority = EventPriority.MONITOR,
@@ -175,7 +175,7 @@ inline fun <reified E : BotEvent> Bot.incoming(
 @kotlin.internal.LowPriorityInOverloadResolution
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @PlannedRemoval("1.2.0")
-fun <R> CoroutineScope.subscribeMessages(
+public fun <R> CoroutineScope.subscribeMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: MessagePacketSubscribersBuilder.() -> R
@@ -184,7 +184,7 @@ fun <R> CoroutineScope.subscribeMessages(
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @kotlin.internal.LowPriorityInOverloadResolution
 @PlannedRemoval("1.2.0")
-fun <R> CoroutineScope.subscribeGroupMessages(
+public fun <R> CoroutineScope.subscribeGroupMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: GroupMessageSubscribersBuilder.() -> R
@@ -193,7 +193,7 @@ fun <R> CoroutineScope.subscribeGroupMessages(
 @kotlin.internal.LowPriorityInOverloadResolution
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @PlannedRemoval("1.2.0")
-fun <R> CoroutineScope.subscribeFriendMessages(
+public fun <R> CoroutineScope.subscribeFriendMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: FriendMessageSubscribersBuilder.() -> R
@@ -202,7 +202,7 @@ fun <R> CoroutineScope.subscribeFriendMessages(
 @kotlin.internal.LowPriorityInOverloadResolution
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @PlannedRemoval("1.2.0")
-fun <R> CoroutineScope.subscribeTempMessages(
+public fun <R> CoroutineScope.subscribeTempMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: TempMessageSubscribersBuilder.() -> R
@@ -211,7 +211,7 @@ fun <R> CoroutineScope.subscribeTempMessages(
 @kotlin.internal.LowPriorityInOverloadResolution
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @PlannedRemoval("1.2.0")
-fun <R> Bot.subscribeMessages(
+public fun <R> Bot.subscribeMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: MessagePacketSubscribersBuilder.() -> R
@@ -220,7 +220,7 @@ fun <R> Bot.subscribeMessages(
 @kotlin.internal.LowPriorityInOverloadResolution
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @PlannedRemoval("1.2.0")
-fun <R> Bot.subscribeGroupMessages(
+public fun <R> Bot.subscribeGroupMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: GroupMessageSubscribersBuilder.() -> R
@@ -229,7 +229,7 @@ fun <R> Bot.subscribeGroupMessages(
 @kotlin.internal.LowPriorityInOverloadResolution
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @PlannedRemoval("1.2.0")
-fun <R> Bot.subscribeFriendMessages(
+public fun <R> Bot.subscribeFriendMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: FriendMessageSubscribersBuilder.() -> R
@@ -238,7 +238,7 @@ fun <R> Bot.subscribeFriendMessages(
 @kotlin.internal.LowPriorityInOverloadResolution
 @Deprecated("for binary compatibility", level = DeprecationLevel.HIDDEN)
 @PlannedRemoval("1.2.0")
-fun <R> Bot.subscribeTempMessages(
+public fun <R> Bot.subscribeTempMessages(
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
     concurrencyKind: Listener.ConcurrencyKind = Listener.ConcurrencyKind.CONCURRENT,
     listeners: TempMessageSubscribersBuilder.() -> R

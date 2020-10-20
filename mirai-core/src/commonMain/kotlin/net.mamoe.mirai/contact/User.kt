@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -15,11 +15,17 @@ import kotlinx.coroutines.CoroutineScope
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.MessageReceipt
+import net.mamoe.mirai.message.action.FriendNudge
+import net.mamoe.mirai.message.action.Nudge
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.Message
-import net.mamoe.mirai.message.data.toMessage
+import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.isContentEmpty
+import net.mamoe.mirai.message.recall
 import net.mamoe.mirai.utils.ExternalImage
+import net.mamoe.mirai.utils.MiraiExperimentalAPI
 import net.mamoe.mirai.utils.OverFileSizeMaxException
+import net.mamoe.mirai.utils.SinceMirai
 import kotlin.jvm.JvmSynthetic
 
 /**
@@ -32,21 +38,21 @@ import kotlin.jvm.JvmSynthetic
  *
  * 对于同一个 [Bot] 任何一个人的 [User] 实例都是单一的.
  */
-abstract class User : Contact(), CoroutineScope {
+public abstract class User : Contact(), CoroutineScope {
     /**
      * QQ 号码
      */
-    abstract override val id: Long
+    public abstract override val id: Long
 
     /**
      * 昵称
      */
-    abstract val nick: String
+    public abstract val nick: String
 
     /**
      * 头像下载链接
      */
-    open val avatarUrl: String
+    public open val avatarUrl: String
         get() = "http://q1.qlogo.cn/g?b=qq&nk=$id&s=640"
 
     /**
@@ -65,7 +71,16 @@ abstract class User : Contact(), CoroutineScope {
      * @return 消息回执. 可进行撤回 ([MessageReceipt.recall])
      */
     @JvmSynthetic
-    abstract override suspend fun sendMessage(message: Message): MessageReceipt<User>
+    public abstract override suspend fun sendMessage(message: Message): MessageReceipt<User>
+
+    /**
+     * 创建一个 "戳一戳" 消息
+     *
+     * @see FriendNudge.sendTo 发送这个戳一戳消息
+     */
+    @MiraiExperimentalAPI
+    @SinceMirai("1.3.0")
+    public abstract fun nudge(): Nudge
 
     /**
      * @see sendMessage
@@ -73,8 +88,8 @@ abstract class User : Contact(), CoroutineScope {
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE", "VIRTUAL_MEMBER_HIDDEN", "OVERRIDE_BY_INLINE")
     @kotlin.internal.InlineOnly
     @JvmSynthetic
-    suspend inline fun sendMessage(message: String): MessageReceipt<User> {
-        return sendMessage(message.toMessage())
+    public suspend inline fun sendMessage(message: String): MessageReceipt<User> {
+        return sendMessage(PlainText(message))
     }
 
     /**
@@ -89,7 +104,7 @@ abstract class User : Contact(), CoroutineScope {
      * @throws OverFileSizeMaxException 当图片文件过大而被服务器拒绝上传时. (最大大小约为 20 MB)
      */
     @JvmSynthetic
-    abstract override suspend fun uploadImage(image: ExternalImage): Image
+    public abstract override suspend fun uploadImage(image: ExternalImage): Image
 
-    abstract override fun toString(): String
+    public abstract override fun toString(): String
 }

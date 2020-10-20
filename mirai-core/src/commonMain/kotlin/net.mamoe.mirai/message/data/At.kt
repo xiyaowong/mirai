@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -32,30 +32,30 @@ import kotlin.jvm.JvmSynthetic
  *
  * @see AtAll 全体成员
  */
-data class At
+public data class At
 @Suppress("DataClassPrivateConstructor")
 private constructor(
-    val target: Long,
+    public val target: Long,
     /**
      * "@群员名片"
      */
-    val display: String
+    public val display: String
 ) : MessageContent, CodableMessage {
 
     /**
      * 构造一个 [At] 实例. 这是唯一的公开的构造方式.
      */
-    constructor(member: Member) : this(member.id, "@${member.nameCardOrNick}")
+    public constructor(member: Member) : this(member.id, "@${member.nameCardOrNick}")
 
-    override fun equals(other: Any?): Boolean {
+    public override fun equals(other: Any?): Boolean {
         return other is At && other.target == this.target && other.display == this.display
     }
 
-    override fun toString(): String = "[mirai:at:$target,$display]"
-    override fun contentToString(): String = this.display
+    public override fun toString(): String = "[mirai:at:$target,$display]"
+    public override fun contentToString(): String = this.display
 
-    companion object Key : Message.Key<At> {
-        override val typeName: String
+    public companion object Key : Message.Key<At> {
+        public override val typeName: String
             get() = "At"
 
         /**
@@ -64,18 +64,18 @@ private constructor(
         @Suppress("FunctionName")
         @JvmStatic
         @LowLevelAPI
-        fun _lowLevelConstructAtInstance(target: Long, display: String): At = At(target, display)
+        public fun _lowLevelConstructAtInstance(target: Long, display: String): At = At(target, display)
     }
 
     // 自动为消息补充 " "
-    override fun followedBy(tail: Message): MessageChain {
+    public override fun followedBy(tail: Message): MessageChain {
         if (tail is PlainText && tail.content.startsWith(' ')) {
             return super<MessageContent>.followedBy(tail)
         }
         return super<MessageContent>.followedBy(PlainText(" ")) + tail
     }
 
-    override fun hashCode(): Int {
+    public override fun hashCode(): Int {
         var result = target.hashCode()
         result = 31 * result + display.hashCode()
         return result
@@ -88,4 +88,4 @@ private constructor(
  */
 @JvmSynthetic
 @Suppress("NOTHING_TO_INLINE")
-inline fun Member.at(): At = At(this)
+public inline fun Member.at(): At = At(this)

@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -15,6 +15,7 @@ package net.mamoe.mirai.utils
 
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,22 +44,22 @@ import java.util.*
  * @see SingleFileLogger 使用单一文件记录日志
  * @see DirectoryLogger 在一个目录中按日期存放文件记录日志, 自动清理过期日志
  */
-actual open class PlatformLogger @JvmOverloads constructor(
-    override val identity: String? = "Mirai",
+public actual open class PlatformLogger @JvmOverloads constructor(
+    public override val identity: String? = "Mirai",
     /**
      * 日志输出. 不会自动添加换行
      */
-    open val output: (String) -> Unit,
-    val isColored: Boolean = true
+    public open val output: (String) -> Unit,
+    public val isColored: Boolean = true
 ) : MiraiLoggerPlatformBase() {
-    actual constructor(identity: String?) : this(identity, ::println)
+    public actual constructor(identity: String?) : this(identity, ::println)
 
     /**
      * 输出一条日志. [message] 末尾可能不带换行符.
      */
     @SinceMirai("1.1.0")
     protected open fun printLog(message: String?, priority: SimpleLogger.LogPriority) {
-        if (isColored) output("${priority.color}$currentTimeFormatted ${priority.simpleName}/$identity: $message")
+        if (isColored) output("${priority.color}$currentTimeFormatted ${priority.simpleName}/$identity: $message${Color.RESET}")
         else output("$currentTimeFormatted ${priority.simpleName}/$identity: $message")
     }
 
@@ -75,39 +76,39 @@ actual open class PlatformLogger @JvmOverloads constructor(
             SimpleLogger.LogPriority.DEBUG -> Color.LIGHT_CYAN
         }
 
-    override fun verbose0(message: String?) = printLog(message, SimpleLogger.LogPriority.VERBOSE)
+    public override fun verbose0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.VERBOSE)
 
-    override fun verbose0(message: String?, e: Throwable?) {
+    public override fun verbose0(message: String?, e: Throwable?) {
         if (e != null) verbose((message ?: e.toString()) + "\n${e.stackTraceString}")
         else verbose(message.toString())
     }
 
-    override fun info0(message: String?) = printLog(message, SimpleLogger.LogPriority.INFO)
-    override fun info0(message: String?, e: Throwable?) {
+    public override fun info0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.INFO)
+    public override fun info0(message: String?, e: Throwable?) {
         if (e != null) info((message ?: e.toString()) + "\n${e.stackTraceString}")
         else info(message.toString())
     }
 
-    override fun warning0(message: String?) = printLog(message, SimpleLogger.LogPriority.WARNING)
-    override fun warning0(message: String?, e: Throwable?) {
+    public override fun warning0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.WARNING)
+    public override fun warning0(message: String?, e: Throwable?) {
         if (e != null) warning((message ?: e.toString()) + "\n${e.stackTraceString}")
         else warning(message.toString())
     }
 
-    override fun error0(message: String?) = printLog(message, SimpleLogger.LogPriority.ERROR)
-    override fun error0(message: String?, e: Throwable?) {
+    public override fun error0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.ERROR)
+    public override fun error0(message: String?, e: Throwable?) {
         if (e != null) error((message ?: e.toString()) + "\n${e.stackTraceString}")
         else error(message.toString())
     }
 
-    override fun debug0(message: String?) = printLog(message, SimpleLogger.LogPriority.DEBUG)
-    override fun debug0(message: String?, e: Throwable?) {
+    public override fun debug0(message: String?): Unit = printLog(message, SimpleLogger.LogPriority.DEBUG)
+    public override fun debug0(message: String?, e: Throwable?) {
         if (e != null) debug((message ?: e.toString()) + "\n${e.stackTraceString}")
         else debug(message.toString())
     }
 
     @SinceMirai("1.1.0")
-    protected open val timeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
+    protected open val timeFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.SIMPLIFIED_CHINESE)
 
     private val currentTimeFormatted get() = timeFormat.format(Date())
 

@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -14,11 +14,12 @@ package net.mamoe.mirai.data
 /**
  * 在线状态
  */
-enum class OnlineStatus(val id: Int) {
+public enum class OnlineStatus(public val id: Int) {
     /**
      * 我在线上
      */
     ONLINE(11),
+
     /**
      * 离线
      */
@@ -38,14 +39,17 @@ enum class OnlineStatus(val id: Int) {
      * 忙碌
      */
     BUSY(50),
+
     /**
      * Q 我吧
      */
     Q_ME(60),
+
     /**
      * 请勿打扰
      */
     DND(70),
+
     /**
      * 离线但接收消息
      */
@@ -56,8 +60,8 @@ enum class OnlineStatus(val id: Int) {
      */
     UNKNOWN(-1);
 
-    companion object {
-        fun ofId(id: Int): OnlineStatus = values().first { it.id == id }
-        fun ofIdOrNull(id: Int): OnlineStatus? = values().firstOrNull { it.id == id }
+    public companion object {
+        public fun ofId(id: Int): OnlineStatus = values().first { it.id == id }
+        public fun ofIdOrNull(id: Int): OnlineStatus? = values().firstOrNull { it.id == id }
     }
 }

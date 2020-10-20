@@ -8,6 +8,12 @@ mirai 欢迎一切形式的代码贡献。你可以通过以下几种途径向 m
 
 **阅读文档**： [docs/mirai.md](docs/mirai.md)
 
+### 构建
+- 要构建项目, 请运行 `gradlew assemble`
+- 要运行测试, 请运行 `gradlew test`
+- 要构建项目并运行测试, 请运行 `gradlew build`
+- 若要添加一个 suspend 函数, 请务必考虑 Java 兼容性, 使用 [kotlin-jvm-blocking-bridge](https://github.com/mamoe/kotlin-jvm-blocking-bridge/blob/master/README-chs.md)
+
 ### 能做什么?
 
 **请基于 `master` 分支进行文档修改; 基于 `dev` 分支进行其他修改 (否则你的修改可能被关闭或不会立即合并)**
@@ -19,7 +25,7 @@ mirai 欢迎一切形式的代码贡献。你可以通过以下几种途径向 m
 ### 注意事项
 - 尽量不要引用新的库
 - 遵守 Kotlin 官方代码规范（提交前使用 IDE 格式化代码 (commit 时勾选 'Reformat code')）
-- 不要手动拆解数据包. 请一定使用 `kotlinx.serialization` 拆解 ProtoBuf, 使用 [`jcekt`](https://github.com/him188/jcekt) 拆解 Tars 数据包, 使用 `kotlinx.serialization` 拆解 Json 数据.
+- 不要手动拆解数据包. 请一定使用 `kotlinx.serialization` 拆解 ProtoBuf, 使用 `net.mamoe.mirai.qqandroid.utils.io.serialization.Tars` 拆解 Tars 数据包, 使用 `kotlinx.serialization` 拆解 Json 数据.
 
 ## 社区
 

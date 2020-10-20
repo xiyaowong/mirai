@@ -1,69 +1,75 @@
+/*
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
+ *
+ * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
+ *
+ * https://github.com/mamoe/mirai/blob/master/LICENSE
+ */
+
 package net.mamoe.mirai.data
 
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.LowLevelAPI
 
 /**
  * 群资料.
- *
- * 通过 [Bot._lowLevelQueryGroupInfo] 得到
  */
 @LowLevelAPI
-interface GroupInfo {
+public interface GroupInfo {
     /**
      * Uin
      */
-    val uin: Long
+    public val uin: Long
 
     /**
      * 群号码
      */ // 由 uin 计算得到
-    val groupCode: Long
+    public val groupCode: Long
 
     /**
      * 名称
      */
-    val name: String // 不一定能获取到
+    public val name: String // 不一定能获取到
 
     /**
      * 群主
      */
-    val owner: Long // 不一定能获取到
+    public val owner: Long // 不一定能获取到
 
     /**
      * 入群公告
      */
-    val memo: String // 不一定能获取到
+    public val memo: String // 不一定能获取到
 
     /**
      * 允许群员邀请其他人加入群
      */
-    val allowMemberInvite: Boolean
+    public val allowMemberInvite: Boolean
 
     /**
      * 允许匿名聊天
      */
-    val allowAnonymousChat: Boolean
+    public val allowAnonymousChat: Boolean
 
     /**
      * 自动审批加群请求
      */
-    val autoApprove: Boolean
+    public val autoApprove: Boolean
 
     /**
      * 坦白说开启状态
      */
-    val confessTalk: Boolean
+    public val confessTalk: Boolean
 
     /**
      * 全员禁言
      */
-    val muteAll: Boolean
+    public val muteAll: Boolean
 
     /**
      * 机器人被禁言还剩时间, 秒.
      */
-    val botMuteTimestamp: Int
+    public val botMuteTimestamp: Int
 
     /*
     /**

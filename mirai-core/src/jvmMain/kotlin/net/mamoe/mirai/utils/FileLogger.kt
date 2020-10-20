@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -21,7 +21,7 @@ private val currentDate get() = SimpleDateFormat("yyyy-MM-dd").format(Date())
  *
  * @see PlatformLogger 查看格式信息
  */
-class SingleFileLogger @JvmOverloads constructor(identity: String, file: File = File("$identity-$currentDate.log")) :
+public class SingleFileLogger @JvmOverloads constructor(identity: String, file: File = File("$identity-$currentDate.log")) :
     PlatformLogger(identity, { file.appendText(it + "\n") }, false) {
 
     init {
@@ -39,7 +39,7 @@ private val STUB: (priority: SimpleLogger.LogPriority, message: String?, e: Thro
  *
  * @see PlatformLogger 查看格式信息
  */
-class DirectoryLogger @JvmOverloads constructor(
+public class DirectoryLogger @JvmOverloads constructor(
     identity: String,
     private val directory: File = File(identity),
     /**

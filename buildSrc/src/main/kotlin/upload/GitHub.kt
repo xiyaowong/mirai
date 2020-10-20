@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -13,10 +13,10 @@ package upload
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.features.HttpTimeout
-import io.ktor.client.request.put
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
+import io.ktor.client.request.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -26,6 +26,9 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
+import java.security.MessageDigest
 import java.util.*
 
 internal val Http = HttpClient(CIO) {
@@ -71,7 +74,38 @@ object GitHub {
         )
     }
 
-    fun upload(file: File, project: Project, repo: String, targetFilePath: String) = runBlocking {
+    fun InputStream.md5(): ByteArray {
+        val digest = MessageDigest.getInstance("md5")
+        digest.reset()
+        use { input ->
+            object : OutputStream() {
+                override fun write(b: Int) {
+                    digest.update(b.toByte())
+                }
+
+                override fun write(b: ByteArray, off: Int, len: Int) {
+                    digest.update(b, off, len)
+                }
+            }.use { output ->
+                input.copyTo(output)
+            }
+        }
+        return digest.digest()
+    }
+
+    fun ByteArray.hex(): String = buildString(size * 2) {
+        this@hex.forEach { byte ->
+            val uint = Integer.toHexString(byte.toInt() and 0xFF)
+            if (uint.length == 1) append('0')
+            append(uint)
+        }
+    }
+
+    fun upload(file: File, project: Project, repo: String, targetFilePath: String) = upload(
+        file.readBytes(), project, repo, targetFilePath
+    )
+
+    fun upload(source: ByteArray, project: Project, repo: String, targetFilePath: String) = runBlocking {
         val token = getGithubToken(project)
         println("token.length=${token.length}")
         val url = "https://api.github.com/repos/project-mirai/$repo/contents/$targetFilePath"
@@ -86,10 +120,10 @@ object GitHub {
                     )
                 }.getOrNull()
                 println("sha=$sha")
-                val content = String(Base64.getEncoder().encode(file.readBytes()))
+                val content = String(Base64.getEncoder().encode(source))
                 body = """
                     {
-                      "message": "automatically upload on release",
+                      "message": "Automatically upload on release ${project.name}:${project.version}",
                       "content": "$content"
                       ${if (sha == null) "" else """, "sha": "$sha" """}
                     }

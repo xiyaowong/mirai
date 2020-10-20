@@ -5,6 +5,7 @@ plugins {
     id("kotlinx-atomicfu")
     kotlin("plugin.serialization")
     id("signing")
+    id("net.mamoe.kotlin-jvm-blocking-bridge")
     `maven-publish`
     id("com.jfrog.bintray") version Versions.Publishing.bintray
 }
@@ -14,6 +15,8 @@ description = "Mirai API module"
 val isAndroidSDKAvailable: Boolean by project
 
 kotlin {
+    explicitApi()
+
     if (isAndroidSDKAvailable) {
         apply(from = rootProject.file("gradle/android.gradle"))
         android("android") {
@@ -34,11 +37,11 @@ kotlin {
         )
     }
 
-    jvm() {
+    jvm {
         // withJava() // https://youtrack.jetbrains.com/issue/KT-39991
     }
 
-    sourceSets {
+    sourceSets.apply {
         all {
             languageSettings.enableLanguageFeature("InlineClasses")
             languageSettings.useExperimentalAnnotation("kotlin.Experimental")
@@ -49,28 +52,31 @@ kotlin {
             languageSettings.useExperimentalAnnotation("kotlin.experimental.ExperimentalTypeInference")
             languageSettings.useExperimentalAnnotation("kotlin.time.ExperimentalTime")
             languageSettings.useExperimentalAnnotation("kotlin.contracts.ExperimentalContracts")
+            languageSettings.useExperimentalAnnotation("kotlinx.serialization.ExperimentalSerializationApi")
+            languageSettings.useExperimentalAnnotation("net.mamoe.mirai.utils.UnstableExternalImage")
+
             languageSettings.progressiveMode = true
         }
 
-        commonMain {
+        val commonMain by getting {
             dependencies {
-                api(kotlin("stdlib"))
                 api(kotlin("serialization"))
                 api(kotlin("reflect"))
 
-                api(kotlinx("serialization-runtime-common", Versions.Kotlin.serialization))
-                api(kotlinx("serialization-protobuf-common", Versions.Kotlin.serialization))
-                api(kotlinx("io", Versions.Kotlin.io))
-                api(kotlinx("coroutines-io", Versions.Kotlin.coroutinesIo))
-                api(kotlinx("coroutines-core-common", Versions.Kotlin.coroutines))
+                api1(kotlinx("serialization-core", Versions.Kotlin.serialization))
+                implementation1(kotlinx("serialization-protobuf", Versions.Kotlin.serialization))
+                api1(kotlinx("io", Versions.Kotlin.io))
+                api1(kotlinx("coroutines-io", Versions.Kotlin.coroutinesIo))
+                api(kotlinx("coroutines-core", Versions.Kotlin.coroutines))
 
-                api("org.jetbrains.kotlinx:atomicfu-common:${Versions.Kotlin.atomicFU}")
+                implementation1("org.jetbrains.kotlinx:atomicfu:${Versions.Kotlin.atomicFU}")
 
-                api(ktor("client-cio", Versions.Kotlin.ktor))
-                api(ktor("client-core", Versions.Kotlin.ktor))
-                api(ktor("network", Versions.Kotlin.ktor))
+                api1(ktor("client-cio"))
+                api1(ktor("client-core"))
+                api1(ktor("network"))
             }
         }
+
         commonTest {
             dependencies {
                 implementation(kotlin("test-annotations-common"))
@@ -83,13 +89,10 @@ kotlin {
                 dependencies {
                     api(kotlin("reflect"))
 
-                    api(kotlinx("io-jvm", Versions.Kotlin.io))
-                    api(kotlinx("serialization-runtime", Versions.Kotlin.serialization))
-                    api(kotlinx("serialization-protobuf", Versions.Kotlin.serialization))
-                    api(kotlinx("coroutines-io-jvm", Versions.Kotlin.coroutinesIo))
-                    api(kotlinx("coroutines-core", Versions.Kotlin.coroutines))
+                    api1(kotlinx("io-jvm", Versions.Kotlin.io))
+                    api1(kotlinx("coroutines-io-jvm", Versions.Kotlin.coroutinesIo))
 
-                    api(ktor("client-android", Versions.Kotlin.ktor))
+                    api1(ktor("client-android", Versions.Kotlin.ktor))
                 }
             }
 
@@ -105,19 +108,13 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                //api(kotlin("stdlib-jdk8"))
-                //api(kotlin("stdlib-jdk7"))
                 api(kotlin("reflect"))
+                compileOnly("org.apache.logging.log4j:log4j-api:" + Versions.Logging.log4j)
+                compileOnly("org.slf4j:slf4j-api:" + Versions.Logging.slf4j)
 
-                api(ktor("client-core-jvm", Versions.Kotlin.ktor))
-                api(kotlinx("io-jvm", Versions.Kotlin.io))
-                api(kotlinx("serialization-runtime", Versions.Kotlin.serialization))
-                api(kotlinx("serialization-protobuf", Versions.Kotlin.serialization))
-                api(kotlinx("coroutines-io-jvm", Versions.Kotlin.coroutinesIo))
-                api(kotlinx("coroutines-core", Versions.Kotlin.coroutines))
-
-                api("org.bouncycastle:bcprov-jdk15on:1.64")
-                runtimeOnly(files("build/classes/kotlin/jvm/main")) // classpath is not properly set by IDE
+                api1(ktor("client-core-jvm", Versions.Kotlin.ktor))
+                api1(kotlinx("io-jvm", Versions.Kotlin.io))
+                api1(kotlinx("coroutines-io-jvm", Versions.Kotlin.coroutinesIo))
             }
         }
 
@@ -133,4 +130,38 @@ kotlin {
     }
 }
 
+fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.implementation1(dependencyNotation: String) =
+    implementation(dependencyNotation) {
+        exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core-common")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core-jvm")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core-metadata")
+    }
+
+fun org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler.api1(dependencyNotation: String) =
+    api(dependencyNotation) {
+        exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core-common")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core-jvm")
+        exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core-metadata")
+    }
+
 apply(from = rootProject.file("gradle/publish.gradle"))
+
+tasks.withType<com.jfrog.bintray.gradle.tasks.BintrayUploadTask> {
+    doFirst {
+        publishing.publications
+            .filterIsInstance<MavenPublication>()
+            .forEach { publication ->
+                val moduleFile = buildDir.resolve("publications/${publication.name}/module.json")
+                if (moduleFile.exists()) {
+                    publication.artifact(object :
+                        org.gradle.api.publish.maven.internal.artifact.FileBasedMavenArtifact(moduleFile) {
+                        override fun getDefaultExtension() = "module"
+                    })
+                }
+            }
+    }
+}

@@ -1,14 +1,15 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
 
 package net.mamoe.mirai.qqandroid.network.protocol.packet.chat.receive
 
+import kotlinx.atomicfu.loop
 import kotlinx.io.core.ByteReadPacket
 import kotlinx.io.core.discardExact
 import net.mamoe.mirai.qqandroid.QQAndroidBot
@@ -17,7 +18,6 @@ import net.mamoe.mirai.qqandroid.network.protocol.data.proto.MsgSvc
 import net.mamoe.mirai.qqandroid.network.protocol.packet.IncomingPacketFactory
 import net.mamoe.mirai.qqandroid.network.protocol.packet.OutgoingPacket
 import net.mamoe.mirai.qqandroid.utils.io.serialization.readUniPacket
-import net.mamoe.mirai.utils.currentTimeSeconds
 
 
 /**
@@ -31,12 +31,19 @@ internal object MessageSvcPushNotify : IncomingPacketFactory<RequestPushNotify>(
 
     override suspend fun QQAndroidBot.handle(packet: RequestPushNotify, sequenceId: Int): OutgoingPacket? {
 
-        network.run {
-            return MessageSvcPbGetMsg(
-                client,
-                MsgSvc.SyncFlag.START,
-                packet.stMsgInfo?.uMsgTime ?: currentTimeSeconds
-            )
+        client.syncingController.firstNotify.loop { firstNotify ->
+            network.run {
+                return MessageSvcPbGetMsg(
+                    client,
+                    MsgSvc.SyncFlag.START,
+                    if (firstNotify) {
+                        if (!client.syncingController.firstNotify.compareAndSet(firstNotify, false)) {
+                            return@loop
+                        }
+                        null
+                    } else packet.vNotifyCookie
+                )
+            }
         }
     }
 }

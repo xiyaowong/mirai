@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -61,8 +61,8 @@ import java.net.URL
  * @see FlashImage 闪照
  * @see Image.flash 转换普通图片为闪照
  */
-actual interface Image : Message, MessageContent, CodableMessage {
-    actual companion object Key : Message.Key<Image> {
+public actual interface Image : Message, MessageContent, CodableMessage {
+    public actual companion object Key : Message.Key<Image> {
         actual override val typeName: String get() = "Image"
     }
 
@@ -82,7 +82,7 @@ actual interface Image : Message, MessageContent, CodableMessage {
      *
      * @see Image 使用 id 构造图片
      */
-    actual val imageId: String
+    public actual val imageId: String
 
 
     @Deprecated(

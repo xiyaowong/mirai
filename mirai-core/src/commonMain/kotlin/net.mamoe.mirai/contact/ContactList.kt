@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -22,24 +22,24 @@ import kotlin.jvm.JvmField
  * @see ContactList.asSequence
  */
 @Suppress("unused")
-class ContactList<C : Contact>
+public class ContactList<C : Contact>
 internal constructor(@JvmField internal val delegate: LockFreeLinkedList<C>) : Collection<C> {
 
-    operator fun get(id: Long): C =
+    public operator fun get(id: Long): C =
         delegate.asSequence().firstOrNull { it.id == id } ?: throw NoSuchElementException("Contact id $id")
 
-    fun getOrNull(id: Long): C? = delegate.getOrNull(id)
+    public fun getOrNull(id: Long): C? = delegate.getOrNull(id)
 
-    override val size: Int get() = delegate.size
-    override operator fun contains(element: C): Boolean = delegate.contains(element)
-    operator fun contains(id: Long): Boolean = delegate.getOrNull(id) != null
-    override fun containsAll(elements: Collection<C>): Boolean = elements.all { contains(it) }
-    override fun isEmpty(): Boolean = delegate.isEmpty()
+    public override val size: Int get() = delegate.size
+    public override operator fun contains(element: C): Boolean = delegate.contains(element)
+    public operator fun contains(id: Long): Boolean = delegate.getOrNull(id) != null
+    public override fun containsAll(elements: Collection<C>): Boolean = elements.all { contains(it) }
+    public override fun isEmpty(): Boolean = delegate.isEmpty()
 
-    override fun toString(): String =
+    public override fun toString(): String =
         delegate.asSequence().joinToString(separator = ", ", prefix = "ContactList(", postfix = ")")
 
-    override fun iterator(): Iterator<C> {
+    public override fun iterator(): Iterator<C> {
         return this.delegate.asSequence().iterator()
     }
 }
@@ -51,7 +51,7 @@ internal constructor(@JvmField internal val delegate: LockFreeLinkedList<C>) : C
  * [123456, 321654, 123654]
  * ```
  */
-val ContactList<*>.idContentString: String
+public val ContactList<*>.idContentString: String
     get() = "[" + buildString { delegate.forEach { append(it.id).append(", ") } }.dropLast(
         2
     ) + "]"

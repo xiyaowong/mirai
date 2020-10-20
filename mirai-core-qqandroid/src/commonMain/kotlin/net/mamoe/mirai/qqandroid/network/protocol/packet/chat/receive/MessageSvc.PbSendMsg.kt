@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -25,13 +25,15 @@ import net.mamoe.mirai.qqandroid.message.MessageSourceToTempImpl
 import net.mamoe.mirai.qqandroid.message.toRichTextElems
 import net.mamoe.mirai.qqandroid.network.Packet
 import net.mamoe.mirai.qqandroid.network.QQAndroidClient
-import net.mamoe.mirai.qqandroid.network.protocol.data.proto.*
+import net.mamoe.mirai.qqandroid.network.protocol.data.proto.ImMsgBody
+import net.mamoe.mirai.qqandroid.network.protocol.data.proto.MsgComm
+import net.mamoe.mirai.qqandroid.network.protocol.data.proto.MsgCtrl
+import net.mamoe.mirai.qqandroid.network.protocol.data.proto.MsgSvc
 import net.mamoe.mirai.qqandroid.network.protocol.packet.EMPTY_BYTE_ARRAY
 import net.mamoe.mirai.qqandroid.network.protocol.packet.OutgoingPacket
 import net.mamoe.mirai.qqandroid.network.protocol.packet.OutgoingPacketFactory
 import net.mamoe.mirai.qqandroid.network.protocol.packet.buildOutgoingUniPacket
 import net.mamoe.mirai.qqandroid.utils.io.serialization.readProtoBuf
-import net.mamoe.mirai.qqandroid.utils.io.serialization.toByteArray
 import net.mamoe.mirai.qqandroid.utils.io.serialization.writeProtoBuf
 import net.mamoe.mirai.utils.currentTimeSeconds
 import kotlin.contracts.InvocationKind
@@ -78,7 +80,7 @@ internal object MessageSvcPbSendMsg : OutgoingPacketFactory<MessageSvcPbSendMsg.
                 ),
                 msgSeq = source.sequenceId,
                 msgRand = source.internalId,
-                syncCookie = SyncCookie(time = source.time.toLong()).toByteArray(SyncCookie.serializer())
+                syncCookie = client.syncingController.syncCookie ?: byteArrayOf()
                 // msgVia = 1
             )
         )
@@ -108,7 +110,7 @@ internal object MessageSvcPbSendMsg : OutgoingPacketFactory<MessageSvcPbSendMsg.
                 ),
                 msgSeq = source.sequenceId,
                 msgRand = source.internalId,
-                syncCookie = SyncCookie(time = source.time.toLong()).toByteArray(SyncCookie.serializer())
+                syncCookie = client.syncingController.syncCookie ?: byteArrayOf()
             )
         )
     }
@@ -138,7 +140,14 @@ internal object MessageSvcPbSendMsg : OutgoingPacketFactory<MessageSvcPbSendMsg.
                     richText = ImMsgBody.RichText(
                         elems = message.toRichTextElems(forGroup = true, withGeneralFlags = true),
                         ptt = message.firstOrNull(PttMessage)?.run {
-                            ImMsgBody.Ptt(fileName = fileName.toByteArray(), fileMd5 = md5)
+                            ImMsgBody.Ptt(
+                                fileName = fileName.toByteArray(),
+                                fileMd5 = md5,
+                                boolValid = true,
+                                fileSize = fileSize.toInt(),
+                                fileType = 4,
+                                pbReserve = byteArrayOf(0)
+                            )
                         }
                     )
                 ),

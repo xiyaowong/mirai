@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -15,16 +15,18 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.io.ByteReadChannel
-import kotlinx.io.InputStream
 import kotlinx.io.core.ByteReadPacket
 import kotlinx.io.core.Closeable
 import kotlinx.io.core.Input
 import kotlinx.serialization.InternalSerializationApi
+import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import java.io.InputStream
 import kotlin.jvm.JvmField
 
 
-internal interface ChunkedFlowSession<T> : Closeable {
-    val flow: Flow<T>
+@MiraiExperimentalAPI
+public interface ChunkedFlowSession<T> : Closeable {
+    public val flow: Flow<T>
     override fun close()
 }
 
@@ -39,7 +41,8 @@ internal inline fun <T, R> ChunkedFlowSession<T>.map(crossinline mapper: suspend
 /**
  * 由 [chunkedFlow] 分割得到的区块
  */
-internal class ChunkedInput(
+@MiraiExperimentalAPI
+public class ChunkedInput(
     /**
      * 区块的数据.
      * 由 [ByteArrayPool] 缓存并管理, 只可在 [Flow.collect] 中访问.
@@ -47,13 +50,13 @@ internal class ChunkedInput(
      *
      * **注意**: 不要将他带出 [Flow.collect] 作用域, 否则将造成内存泄露
      */
-    @JvmField val buffer: ByteArray,
+    @JvmField public val buffer: ByteArray,
     @JvmField internal var size: Int
 ) {
     /**
      * [buffer] 的有效大小
      */
-    inline val bufferSize: Int get() = size
+    public val bufferSize: Int get() = size
 }
 
 /**

@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
- * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -16,13 +16,14 @@ import net.mamoe.mirai.JavaFriendlyAPI
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.getFriendOrNull
 import net.mamoe.mirai.message.MessageReceipt
+import net.mamoe.mirai.message.action.MemberNudge
+import net.mamoe.mirai.message.action.Nudge
 import net.mamoe.mirai.message.data.Message
+import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.isContentEmpty
-import net.mamoe.mirai.message.data.toMessage
 import net.mamoe.mirai.message.recall
-import net.mamoe.mirai.utils.hoursToSeconds
-import net.mamoe.mirai.utils.daysToSeconds
-import net.mamoe.mirai.utils.minutesToSeconds
+import net.mamoe.mirai.utils.MiraiExperimentalAPI
+import net.mamoe.mirai.utils.SinceMirai
 import net.mamoe.mirai.utils.WeakRefProperty
 import kotlin.jvm.JvmSynthetic
 import kotlin.time.Duration
@@ -39,19 +40,19 @@ import kotlin.time.ExperimentalTime
  */
 @Suppress("INAPPLICABLE_JVM_NAME", "EXPOSED_SUPER_CLASS")
 @OptIn(JavaFriendlyAPI::class)
-abstract class Member : MemberJavaFriendlyAPI, User() {
+public abstract class Member : MemberJavaFriendlyAPI, User() {
     /**
      * 所在的群.
      */
     @WeakRefProperty
-    abstract val group: Group
+    public abstract val group: Group
 
     /**
      * 成员的权限, 动态更新.
      *
      * @see MemberPermissionChangeEvent 权限变更事件. 由群主或机器人的操作触发.
      */
-    abstract val permission: MemberPermission
+    public abstract val permission: MemberPermission
 
     /**
      * 群名片. 可能为空.
@@ -65,7 +66,7 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
      * @see MemberCardChangeEvent 群名片被管理员, 自己或 [Bot] 改动事件. 修改时也会触发此事件.
      * @throws PermissionDeniedException 无权限修改时
      */
-    abstract var nameCard: String
+    public abstract var nameCard: String
 
     /**
      * 群头衔.
@@ -77,7 +78,7 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
      * @see MemberSpecialTitleChangeEvent 群名片被管理员, 自己或 [Bot] 改动事件. 修改时也会触发此事件.
      * @throws PermissionDeniedException 无权限修改时
      */
-    abstract var specialTitle: String
+    public abstract var specialTitle: String
 
     /**
      * 被禁言剩余时长. 单位为秒.
@@ -86,7 +87,7 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
      * @see mute 设置禁言
      * @see unmute 取消禁言
      */
-    abstract val muteTimeRemaining: Int
+    public abstract val muteTimeRemaining: Int
 
     /**
      * 禁言.
@@ -111,7 +112,7 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
      * @throws PermissionDeniedException 无权限修改时抛出
      */
     @JvmSynthetic
-    abstract suspend fun mute(durationSeconds: Int)
+    public abstract suspend fun mute(durationSeconds: Int)
 
     /**
      * 解除禁言.
@@ -125,7 +126,7 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
      * @throws PermissionDeniedException 无权限修改时抛出
      */
     @JvmSynthetic
-    abstract suspend fun unmute()
+    public abstract suspend fun unmute()
 
     /**
      * 踢出该成员.
@@ -136,7 +137,7 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmSynthetic
-    abstract suspend fun kick(message: String = "")
+    public abstract suspend fun kick(message: String = "")
 
     /**
      * 向群成员发送消息.
@@ -158,7 +159,16 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
      * @return 消息回执. 可进行撤回 ([MessageReceipt.recall])
      */
     @JvmSynthetic
-    abstract override suspend fun sendMessage(message: Message): MessageReceipt<Member>
+    public abstract override suspend fun sendMessage(message: Message): MessageReceipt<Member>
+
+    /**
+     * 创建一个 "戳一戳" 消息
+     *
+     * @see MemberNudge.sendTo 发送这个戳一戳消息
+     */
+    @MiraiExperimentalAPI
+    @SinceMirai("1.3.0")
+    public final override fun nudge(): Nudge = MemberNudge(this)
 
     /**
      * @see sendMessage
@@ -166,11 +176,11 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE", "VIRTUAL_MEMBER_HIDDEN", "OVERRIDE_BY_INLINE")
     @kotlin.internal.InlineOnly
     @JvmSynthetic
-    suspend inline fun sendMessage(message: String): MessageReceipt<Member> {
-        return sendMessage(message.toMessage())
+    public suspend inline fun sendMessage(message: String): MessageReceipt<Member> {
+        return sendMessage(PlainText(message))
     }
 
-    final override fun toString(): String = "Member($id)"
+    public final override fun toString(): String = "Member($id)"
 }
 
 /**
@@ -178,23 +188,23 @@ abstract class Member : MemberJavaFriendlyAPI, User() {
  *
  * @throws IllegalStateException 当此成员不是好友时抛出
  */
-fun Member.asFriend(): Friend = this.bot.getFriendOrNull(this.id) ?: error("$this is not a friend")
+public fun Member.asFriend(): Friend = this.bot.getFriendOrNull(this.id) ?: error("$this is not a friend")
 
 /**
  * 得到此成员作为好友的对象, 当此成员不是好友时返回 `null`
  */
-fun Member.asFriendOrNull(): Friend? = this.bot.getFriendOrNull(this.id)
+public fun Member.asFriendOrNull(): Friend? = this.bot.getFriendOrNull(this.id)
 
 /**
  * 判断此成员是否为好友
  */
-inline val Member.isFriend: Boolean
+public inline val Member.isFriend: Boolean
     get() = this.bot.friends.contains(this.id)
 
 /**
  * 如果此成员是好友, 则执行 [block] 并返回其返回值. 否则返回 `null`
  */
-inline fun <R> Member.takeIfIsFriend(block: (Friend) -> R): R? {
+public inline fun <R> Member.takeIfIsFriend(block: (Friend) -> R): R? {
     return this.asFriendOrNull()?.let(block)
 }
 
@@ -203,7 +213,7 @@ inline fun <R> Member.takeIfIsFriend(block: (Friend) -> R): R? {
  *
  * 若 [群名片][Member.nameCard] 不为空则返回群名片, 为空则返回 [User.nick]
  */
-val Member.nameCardOrNick: String get() = this.nameCard.takeIf { it.isNotEmpty() } ?: this.nick
+public val Member.nameCardOrNick: String get() = this.nameCard.takeIf { it.isNotEmpty() } ?: this.nick
 
 /**
  * 获取非空群名片或昵称.
@@ -212,7 +222,7 @@ val Member.nameCardOrNick: String get() = this.nameCard.takeIf { it.isNotEmpty()
  *
  * 否则返回 [Member.nick]
  */
-val User.nameCardOrNick: String
+public val User.nameCardOrNick: String
     get() = when (this) {
         is Member -> this.nameCardOrNick
         else -> this.nick
@@ -221,14 +231,14 @@ val User.nameCardOrNick: String
 /**
  * 判断群成员是否处于禁言状态.
  */
-val Member.isMuted: Boolean
+public val Member.isMuted: Boolean
     get() = muteTimeRemaining != 0 && muteTimeRemaining != 0xFFFFFFFF.toInt()
 
 /**
  * @see Member.mute
  */
 @ExperimentalTime
-suspend inline fun Member.mute(duration: Duration) {
+public suspend inline fun Member.mute(duration: Duration) {
     require(duration.inDays <= 30) { "duration must be at most 1 month" }
     require(duration.inSeconds > 0) { "duration must be greater than 0 second" }
     this.mute(duration.inSeconds.toInt())
@@ -237,4 +247,4 @@ suspend inline fun Member.mute(duration: Duration) {
 /**
  * @see Member.mute
  */
-suspend inline fun Member.mute(durationSeconds: Long) = this.mute(durationSeconds.toInt())
+public suspend inline fun Member.mute(durationSeconds: Long): Unit = this.mute(durationSeconds.toInt())

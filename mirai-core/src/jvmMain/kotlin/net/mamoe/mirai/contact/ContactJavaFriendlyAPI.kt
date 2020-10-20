@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -21,6 +21,7 @@ import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.message.uploadImage
 import net.mamoe.mirai.utils.ExternalImage
 import net.mamoe.mirai.utils.OverFileSizeMaxException
+import net.mamoe.mirai.utils.UnstableExternalImage
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.InputStream
@@ -46,13 +47,13 @@ internal actual interface ContactJavaFriendlyAPI {
      */
     @Throws(EventCancelledException::class, IllegalStateException::class)
     @JvmName("sendMessage")
-    open fun __sendMessageBlockingForJava__(message: Message): MessageReceipt<Contact> {
+    fun __sendMessageBlockingForJava__(message: Message): MessageReceipt<Contact> {
         return runBlocking { sendMessage(message) }
     }
 
     @Throws(EventCancelledException::class, IllegalStateException::class)
     @JvmName("sendMessage")
-    open fun __sendMessageBlockingForJava__(message: String): MessageReceipt<Contact> {
+    fun __sendMessageBlockingForJava__(message: String): MessageReceipt<Contact> {
         return runBlocking { sendMessage(message) }
     }
 
@@ -65,9 +66,10 @@ internal actual interface ContactJavaFriendlyAPI {
      * @throws EventCancelledException 当发送消息事件被取消
      * @throws OverFileSizeMaxException 当图片文件过大而被服务器拒绝上传时. (最大大小约为 20 MB)
      */
+    @UnstableExternalImage
     @Throws(OverFileSizeMaxException::class)
     @JvmName("uploadImage")
-    open fun __uploadImageBlockingForJava__(image: ExternalImage): Image {
+    fun __uploadImageBlockingForJava__(image: ExternalImage): Image {
         return runBlocking { uploadImage(image) }
     }
 
@@ -76,8 +78,9 @@ internal actual interface ContactJavaFriendlyAPI {
      * @throws OverFileSizeMaxException
      */
     @Throws(OverFileSizeMaxException::class)
+    @Suppress("DEPRECATION")
     @JvmName("uploadImage")
-    open fun __uploadImageBlockingForJava__(image: URL): Image {
+    fun __uploadImageBlockingForJava__(image: URL): Image {
         return runBlocking { uploadImage(image) }
     }
 
@@ -87,7 +90,7 @@ internal actual interface ContactJavaFriendlyAPI {
      */
     @Throws(OverFileSizeMaxException::class)
     @JvmName("uploadImage")
-    open fun __uploadImageBlockingForJava__(image: InputStream): Image {
+    fun __uploadImageBlockingForJava__(image: InputStream): Image {
         return runBlocking { uploadImage(image) }
     }
 
@@ -95,9 +98,14 @@ internal actual interface ContactJavaFriendlyAPI {
      * 在 [Dispatchers.IO] 中读取 [Input] 到临时文件并将其作为图片上传, 但不发送
      * @throws OverFileSizeMaxException
      */
+    @Deprecated(
+        "已弃用对 kotlinx.io 的支持",
+        level = DeprecationLevel.ERROR
+    )
+    @Suppress("DEPRECATION_ERROR")
     @Throws(OverFileSizeMaxException::class)
     @JvmName("uploadImage")
-    open fun __uploadImageBlockingForJava__(image: Input): Image {
+    fun __uploadImageBlockingForJava__(image: Input): Image {
         return runBlocking { uploadImage(image) }
     }
 
@@ -107,7 +115,7 @@ internal actual interface ContactJavaFriendlyAPI {
      */
     @Throws(OverFileSizeMaxException::class)
     @JvmName("uploadImage")
-    open fun __uploadImageBlockingForJava__(image: File): Image {
+    fun __uploadImageBlockingForJava__(image: File): Image {
         return runBlocking { uploadImage(image) }
     }
 
@@ -117,7 +125,7 @@ internal actual interface ContactJavaFriendlyAPI {
      */
     @Throws(OverFileSizeMaxException::class)
     @JvmName("uploadImage")
-    open fun __uploadImageBlockingForJava__(image: BufferedImage): Image {
+    fun __uploadImageBlockingForJava__(image: BufferedImage): Image {
         return runBlocking { uploadImage(image) }
     }
 
@@ -126,7 +134,8 @@ internal actual interface ContactJavaFriendlyAPI {
      * @see Contact.sendMessage
      */
     @JvmName("sendMessageAsync")
-    open fun __sendMessageAsyncForJava__(message: Message): Future<MessageReceipt<Contact>> {
+    @Deprecated("已停止支持 Java async API", level = DeprecationLevel.WARNING)
+    fun __sendMessageAsyncForJava__(message: Message): Future<MessageReceipt<Contact>> {
         return future { sendMessage(message) }
     }
 
@@ -135,7 +144,8 @@ internal actual interface ContactJavaFriendlyAPI {
      * @see Contact.sendMessage
      */
     @JvmName("sendMessageAsync")
-    open fun __sendMessageAsyncForJava__(message: String): Future<MessageReceipt<Contact>> {
+    @Deprecated("已停止支持 Java async API", level = DeprecationLevel.WARNING)
+    fun __sendMessageAsyncForJava__(message: String): Future<MessageReceipt<Contact>> {
         return future { sendMessage(message) }
     }
 
@@ -145,32 +155,42 @@ internal actual interface ContactJavaFriendlyAPI {
      * @see BeforeImageUploadEvent 图片发送前事件, cancellable
      * @see ImageUploadEvent 图片发送完成事件
      */
+    @UnstableExternalImage
     @JvmName("uploadImageAsync")
-    open fun __uploadImageAsyncForJava__(image: ExternalImage): Future<Image> {
+    @Deprecated("已停止支持 Java async API", level = DeprecationLevel.WARNING)
+    fun __uploadImageAsyncForJava__(image: ExternalImage): Future<Image> {
         return future { uploadImage(image) }
     }
 
     /**
      * 在 [Dispatchers.IO] 中下载 [URL] 到临时文件并将其作为图片上传, 但不发送
      */
+    @Deprecated("已停止支持 Java async API", level = DeprecationLevel.WARNING)
+    @Suppress("DEPRECATION")
     @JvmName("uploadImageAsync")
-    open fun __uploadImageAsyncForJava__(image: URL): Future<Image> {
+    fun __uploadImageAsyncForJava__(image: URL): Future<Image> {
         return future { uploadImage(image) }
     }
 
     /**
      * 在 [Dispatchers.IO] 中读取 [InputStream] 到临时文件并将其作为图片上传, 但不发送
      */
+    @Deprecated("已停止支持 Java async API", level = DeprecationLevel.WARNING)
     @JvmName("uploadImageAsync")
-    open fun __uploadImageAsyncForJava__(image: InputStream): Future<Image> {
+    fun __uploadImageAsyncForJava__(image: InputStream): Future<Image> {
         return future { uploadImage(image) }
     }
 
     /**
      * 在 [Dispatchers.IO] 中读取 [Input] 到临时文件并将其作为图片上传, 但不发送
      */
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(
+        "已弃用对 kotlinx.io 的支持",
+        level = DeprecationLevel.ERROR
+    )
     @JvmName("uploadImageAsync")
-    open fun __uploadImageAsyncForJava__(image: Input): Future<Image> {
+    fun __uploadImageAsyncForJava__(image: Input): Future<Image> {
         return future { uploadImage(image) }
     }
 
@@ -178,7 +198,8 @@ internal actual interface ContactJavaFriendlyAPI {
      * 在 [Dispatchers.IO] 中将文件作为图片上传, 但不发送
      */
     @JvmName("uploadImageAsync")
-    open fun __uploadImageAsyncForJava__(image: File): Future<Image> {
+    @Deprecated("已停止支持 Java async API", level = DeprecationLevel.WARNING)
+    fun __uploadImageAsyncForJava__(image: File): Future<Image> {
         return future { uploadImage(image) }
     }
 
@@ -186,7 +207,8 @@ internal actual interface ContactJavaFriendlyAPI {
      * 在 [Dispatchers.IO] 中将图片上传, 但不发送. 不会保存临时文件
      */
     @JvmName("uploadImageAsync")
-    open fun __uploadImageAsyncForJava__(image: BufferedImage): Future<Image> {
+    @Deprecated("已停止支持 Java async API", level = DeprecationLevel.WARNING)
+    fun __uploadImageAsyncForJava__(image: BufferedImage): Future<Image> {
         return future { uploadImage(image) }
     }
 }
@@ -227,7 +249,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("mute")
-    open fun __muteBlockingForJava__(seconds: Int) {
+    fun __muteBlockingForJava__(seconds: Int) {
         runBlocking { mute(seconds) }
     }
 
@@ -240,7 +262,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("unmute")
-    open fun __unmuteBlockingForJava__() {
+    fun __unmuteBlockingForJava__() {
         runBlocking { unmute() }
     }
 
@@ -253,7 +275,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("kick")
-    open fun __kickBlockingForJava__(message: String = "") {
+    fun __kickBlockingForJava__(message: String = "") {
         runBlocking { kick(message) }
     }
 
@@ -266,7 +288,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("kick")
-    open fun __kickBlockingForJava__() = __kickBlockingForJava__("")
+    fun __kickBlockingForJava__() = __kickBlockingForJava__("")
 
 
     /**
@@ -288,7 +310,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("muteAsync")
-    open fun __muteAsyncForJava__(seconds: Int): Future<Unit> {
+    fun __muteAsyncForJava__(seconds: Int): Future<Unit> {
         return future { mute(seconds) }
     }
 
@@ -301,7 +323,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("unmuteAsync")
-    open fun __unmuteAsyncForJava__(): Future<Unit> {
+    fun __unmuteAsyncForJava__(): Future<Unit> {
         return future { unmute() }
     }
 
@@ -314,7 +336,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("kickAsync")
-    open fun __kickAsyncForJava__(message: String = ""): Future<Unit> {
+    fun __kickAsyncForJava__(message: String = ""): Future<Unit> {
         return future { kick(message) }
     }
 
@@ -327,7 +349,7 @@ internal actual interface MemberJavaFriendlyAPI {
      * @throws PermissionDeniedException 无权限修改时
      */
     @JvmName("kickAsync")
-    open fun __kickAsyncForJava__(): Future<Unit> = __kickAsyncForJava__("")
+    fun __kickAsyncForJava__(): Future<Unit> = __kickAsyncForJava__("")
 }
 
 @JavaFriendlyAPI

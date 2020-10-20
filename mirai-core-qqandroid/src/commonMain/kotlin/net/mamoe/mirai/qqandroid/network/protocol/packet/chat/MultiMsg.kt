@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -48,33 +48,40 @@ internal fun Collection<ForwardMessage.INode>.calculateValidationDataForGroup(
     random: Int,
     groupCode: Long
 ): MessageValidationData {
-    val msgTransmit = MsgTransmit.PbMultiMsgTransmit(
-        msg = this.map { chain ->
-            MsgComm.Msg(
-                msgHead = MsgComm.MsgHead(
-                    fromUin = chain.senderId,
-                    msgSeq = sequenceId,
-                    msgTime = chain.time,
-                    msgUid = 0x01000000000000000L or random.toLongUnsigned(),
-                    mutiltransHead = MsgComm.MutilTransHead(
-                        status = 0,
-                        msgId = 1
-                    ),
-                    msgType = 82, // troop
-                    groupInfo = MsgComm.GroupInfo(
-                        groupCode = groupCode,
-                        groupCard = chain.senderName // Cinnamon
-                    ),
-                    isSrcMsg = false
+    val msgList = map { chain ->
+        MsgComm.Msg(
+            msgHead = MsgComm.MsgHead(
+                fromUin = chain.senderId,
+                msgSeq = sequenceId,
+                msgTime = chain.time,
+                msgUid = 0x01000000000000000L or random.toLongUnsigned(),
+                mutiltransHead = MsgComm.MutilTransHead(
+                    status = 0,
+                    msgId = 1
                 ),
-                msgBody = ImMsgBody.MsgBody(
-                    richText = ImMsgBody.RichText(
-                        elems = chain.message.asMessageChain()
-                            .toRichTextElems(forGroup = true, withGeneralFlags = false).toMutableList()
-                    )
+                msgType = 82, // troop
+                groupInfo = MsgComm.GroupInfo(
+                    groupCode = groupCode,
+                    groupCard = chain.senderName // Cinnamon
+                ),
+                isSrcMsg = false
+            ),
+            msgBody = ImMsgBody.MsgBody(
+                richText = ImMsgBody.RichText(
+                    elems = chain.message.asMessageChain()
+                        .toRichTextElems(forGroup = true, withGeneralFlags = false).toMutableList()
                 )
             )
-        }
+        )
+    }
+    val msgTransmit = MsgTransmit.PbMultiMsgTransmit(
+        msg = msgList,
+        pbItemList = listOf(
+            MsgTransmit.PbMultiMsgItem(
+                fileName = "MultiMsg",
+                buffer = MsgTransmit.PbMultiMsgNew(msgList).toByteArray(MsgTransmit.PbMultiMsgNew.serializer())
+            )
+        )
     )
 
     val bytes = msgTransmit.toByteArray(MsgTransmit.PbMultiMsgTransmit.serializer())

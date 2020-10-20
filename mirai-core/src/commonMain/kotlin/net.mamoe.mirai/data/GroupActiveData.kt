@@ -1,3 +1,12 @@
+/*
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
+ *
+ * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
+ *
+ * https://github.com/mamoe/mirai/blob/master/LICENSE
+ */
+
 package net.mamoe.mirai.data
 
 
@@ -11,7 +20,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalAPI
  */
 @MiraiExperimentalAPI
 @Serializable
-data class GroupActiveData(
+public data class GroupActiveData(
 
     @SerialName("ec")
     val ec: Int? = null,
@@ -29,7 +38,7 @@ data class GroupActiveData(
     val role: Int? = 0
 ) {
     @Serializable
-    data class GInfo(
+    public data class GInfo(
 
 
         @SerialName("g_act_num")
@@ -39,7 +48,7 @@ data class GroupActiveData(
         val createTime: Int? = 0,
 
         @SerialName("g_exit_num")
-        val exitNum: List<GExitNum?>? =  null,  //退群人数列表
+        val exitNum: List<GExitNum?>? = null,  //退群人数列表
 
         @SerialName("g_join_num")
         val joinNum: List<GJoinNum?>? = null,
@@ -66,7 +75,7 @@ data class GroupActiveData(
         val isEnd: Int? = null
     ) {
         @Serializable
-        data class GActNum(
+        public data class GActNum(
 
             @SerialName("date")
             val date: String? = null,
@@ -76,7 +85,7 @@ data class GroupActiveData(
         )
 
         @Serializable
-        data class GExitNum(
+        public data class GExitNum(
 
             @SerialName("date")
             val date: String? = null,
@@ -86,7 +95,7 @@ data class GroupActiveData(
         )
 
         @Serializable
-        data class GJoinNum(
+        public data class GJoinNum(
 
             @SerialName("date")
             val date: String? = null,
@@ -96,7 +105,7 @@ data class GroupActiveData(
         )
 
         @Serializable
-        data class GMemNum(
+        public data class GMemNum(
 
             @SerialName("date")
             val date: String? = null,
@@ -106,7 +115,7 @@ data class GroupActiveData(
         )
 
         @Serializable
-        data class GMostAct(
+        public data class GMostAct(
 
             @SerialName("name")
             val name: String? = null,  // 名称 不完整
@@ -122,7 +131,7 @@ data class GroupActiveData(
         )
 
         @Serializable
-        data class GSentence(
+        public data class GSentence(
 
             @SerialName("date")
             val date: String? = null,

@@ -1,5 +1,107 @@
 # Version 1.x
 
+## `1.3.1` 2020/9/21
+
+### 新特性
+- 无
+
+### 优化和修复
+- 修复 `BotJoinGroupEvent.Retrieve` 的显示错误 (#606 by @Karlatemp)
+- 添加缺少的戳一戳模板 (#615 by @sandtechnology)
+
+## `1.3.0`  2020/9/16
+
+### 新特性
+
+- 支持群恢复相关事件: `MemberJoinEvent.Retrieve`, `BotJoinGroupEvent.Retrieve` (#531 by @Karlatemp)
+- 群荣耀获取 (`Bot._lowLevelGetGroupHonorListData`) (#501 by @yyuueexxiinngg)
+- 戳一戳事件: `MemberNudgedEvent`, `BotNudgedEvent`.(#600 by @sandtechnology)
+- 发送戳一戳: `Bot.nudge()`, `User.nudge()`
+- 为 `BotFactory` 添加伴生对象. 在顶层方法不方便使用时可使用伴生对象的 `Bot` 构建方法
+
+### 优化和修复
+- **修复好友消息和事件同步相关问题:**
+  - 部分情况下无法同步好友消息 (#249)
+  - BotInvitedJoinGroupRequestEvent 重复执行两次 (#449)
+  - 群消息可能发送失败 (#527)
+  - 机器人启动后第二次被拉入群聊不会刷新群列表 (#580)
+  - 新群员入群事件只触发一次 (#590)
+  - 入群申请 MemberJoinRequestEvent 没有广播 (#542)
+  - 新成员入群未处理 (#567)
+- 修复 `At` 之后的多余空格的问题 (#557)
+- 修复 `QuoteReply` 前多余 `At` 和空格的问题 (#524)
+- 修复群信息初始值 (`isMuteAll`, `isAllowMemberInvite`, ...) (#286)
+- 修复 `Voice.url` 的域名缺失问题 (#584 by @Hieuzest)
+- 修复日志颜色污染的问题 (#596 by @Karlatemp)
+- 修复 `Bot.nick` 无法获取的问题 (#566)
+- 修复登录时 `IndexOutOfBoundsException` 的问题 (#598)
+- 修复 Bot 被踢出群收到的事件类型错误的问题 (#358) (#509 by @sandtechnology)
+- 修复 `Bot.close` 后必须收到一个数据包才会关闭的问题 (#557)
+- 优化 `PermissionDeniedException` 的消息内容
+
+## `1.2.3`  2020/9/11
+- 在同步事件失败时添加重试, 改善 #249, #482, #542, #567, #590
+- 修复不断重连同一个服务器的问题 (#589)
+- 修复 `BotJoinGroupEvent.Active` 和 `BotJoinGroupEvent.Invite` 没有继承 `BotJoinGroupEvent` 的问题 (#532 by [@yyuueexxiinngg](https://github.com/yyuueexxiinngg))
+- 修复 `EmptyMessageChain` 与其他 `MessageChain` 拼接时发生 `NoSuchElementException` 的问题 (#550, #561 by [@sandtechnology](https://github.com/sandtechnology))
+- 为 `Image.queryUrl` 添加 JvmBlockingBridge
+- 优化 `PermissionDeniedException` 的错误信息
+- 更新到 Kotlin `1.4.10`
+
+## `1.2.2`  2020/8/22
+- 修复依赖冲突问题 (#523)
+
+## `1.2.1`  2020/8/19
+- 修复在 Java 调用 `group.uploadImage` 时编译出错的问题 (#511)
+- 为 `group.uploadVoice` 添加 Java 方法 (需要 [kotlin-jvm-blocking-bridge](https://github.com/mamoe/kotlin-jvm-blocking-bridge)) (#512)
+- 更新 ktor 到 1.4.0
+
+## `1.2.0`  2020/8/19
+
+### 新特性
+- 初步语音支持: `Group.uploadVoice`, 支持 silk 或 amr 格式.  
+   **注意**: 现阶段语音实现仅为临时方案, 在将来 (`2.0.0`) 一定会变动. 使用时请评估可能带来的不兼容性.
+
+- 新增将日志转换为 log4j, JDK Logger, SLF4J 等框架的方法: `LoggerAdapters` (#498 by [@Karlatemp](https://github.com/Karlatemp))
+- 支持解析好友输入状态: `FriendInputStatusChangedEvent` (by [@sandtechnology](https://github.com/sandtechnology))
+- 支持解析好友昵称改变事件: `FriendNickChangedEvent` (#507 by [@Karlatemp](https://github.com/Karlatemp))
+- `nextEvent` 和 `nextEventOrNull` 添加 `filter`
+- 将 mirai 码相关内容从 mirai-serialization 集成到 mirai-core
+- `GroupMessageEvent` 现在实现接口 `GroupEvent`
+- `FriendMessageEvent` 现在实现接口 `FriendEvent` (#444)
+
+### 依赖更新
+- 更新 Kotlin 版本到 [`1.4.0`](https://blog.jetbrains.com/zh-hans/kotlin/2020/08/kotlin-1-4-released-with-a-focus-on-quality-and-performance-zh/)
+- 更新 kotlinx-coroutines-core 到 `1.3.9`
+- 使用者也需要更新到 `1.4.0`, 至少更新编译器 (Maven 和 Gradle 插件)
+- **更新 kotlinx-serialization 到 `1.0.0-RC`**: kotlinx-serialization 在此版本做了较大的不兼容改动.
+
+### API 弃用
+- `String.toMessage`: 为避免和 mirai code 产生混乱.
+- `URL.toExternalImage`
+- `Input.toExternalImage`
+
+### 优化和修复
+- 显式 API
+  - mirai 的所有公开 API 均已经显式加上 `public` 修饰符, 遵循 [Koltin Explicit API mode](https://kotlinlang.org/docs/reference/whatsnew14.html#explicit-api-mode-for-library-authors) 规范. 如:
+    ```kotlin
+         data class BotOnlineEvent internal constructor(
+            override val bot: Bot
+        ) : BotActiveEvent, AbstractEvent()
+    ```
+  - *调整了一些不应该公开的 API 为 `internal`, 这些调整在绝大多数情况下不影响现有代码*
+- 修复群权限判断失败的问题 (#389)
+- 修复 `syncFromEvent` 文档错误 (#427)
+- 新增 `BotConfiguration.loadDeviceInfoJson(String)` (#450)
+- 修复成员进群后第一次发言触发改名事件的问题 (#475 by [@cxy654849388](https://github.com/cxy654849388)
+- 修复 `group.quit` 未正确执行的问题 (#472, #477 by [@Mr4s](https://github.com/Mrs4s)
+- 修复初始化时 syncCookie 同步问题
+- 修复 Network Protocol: java.lang.IllegalStateException: returnCode = -10008 (#470)
+- 修复 `Member.isMuted`
+- 修复 `Method.registerEvent` 相关问题 (#495 by @sandtechnology, #499 by @Karlatemp)
+- 修复 Android 手表协议无法监听撤回事件的问题 (#448)
+- 改进好友消息同步过程
+
 ## `1.1.3`  2020/7/17
 - 修复 ListenerHost Java 兼容性问题  (#443, #446 by [@Karlatemp](https://github.com/Karlatemp))
 

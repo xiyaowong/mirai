@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -11,14 +11,11 @@
 
 package net.mamoe.mirai.qqandroid.network.highway
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.post
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.URLProtocol
-import io.ktor.http.content.OutgoingContent
-import io.ktor.http.userAgent
-import io.ktor.utils.io.ByteWriteChannel
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.http.content.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -29,12 +26,9 @@ import kotlinx.io.core.use
 import net.mamoe.mirai.qqandroid.QQAndroidBot
 import net.mamoe.mirai.qqandroid.network.QQAndroidClient
 import net.mamoe.mirai.qqandroid.network.protocol.data.proto.CSDataHighwayHead
-import net.mamoe.mirai.qqandroid.utils.PlatformSocket
-import net.mamoe.mirai.qqandroid.utils.SocketException
-import net.mamoe.mirai.qqandroid.utils.addSuppressedMirai
+import net.mamoe.mirai.qqandroid.utils.*
 import net.mamoe.mirai.qqandroid.utils.io.serialization.readProtoBuf
 import net.mamoe.mirai.qqandroid.utils.io.withUse
-import net.mamoe.mirai.qqandroid.utils.toIpV4AddressString
 import net.mamoe.mirai.utils.internal.ReusableInput
 import net.mamoe.mirai.utils.verbose
 import kotlin.coroutines.EmptyCoroutineContext
@@ -178,6 +172,54 @@ internal object HighwayHelper {
                     }
                 }
             }
+        }
+    }
+
+    suspend fun uploadPttToServers(
+        bot: QQAndroidBot,
+        servers: List<Pair<Int, Int>>,
+        content: ByteArray,
+        md5: ByteArray,
+        uKey: ByteArray,
+        fileKey: ByteArray,
+        codec: Int
+    ) {
+        servers.retryWithServers(10 * 1000, {
+            throw IllegalStateException("cannot upload ptt, failed on all servers.", it)
+        }, { s: String, i: Int ->
+            bot.network.logger.verbose {
+                "[Highway] Uploading ptt to ${s}:$i, size=${content.size.toLong().sizeToString()}"
+            }
+            val time = measureTime {
+                uploadPttToServer(s, i, content, md5, uKey, fileKey, codec)
+            }
+            bot.network.logger.verbose {
+                "[Highway] Uploading ptt: succeed at ${(content.size.toDouble() / 1024 / time.inSeconds).roundToInt()} KiB/s"
+            }
+
+        })
+
+    }
+
+    private suspend fun uploadPttToServer(
+        serverIp: String,
+        serverPort: Int,
+        content: ByteArray,
+        md5: ByteArray,
+        uKey: ByteArray,
+        fileKey: ByteArray,
+        codec: Int
+    ) {
+        MiraiPlatformUtils.Http.post<String> {
+            url("http://$serverIp:$serverPort")
+            parameter("ver", 4679)
+            parameter("ukey", uKey.toUHexString(""))
+            parameter("filekey", fileKey.toUHexString(""))
+            parameter("filesize", content.size)
+            parameter("bmd5", md5.toUHexString(""))
+            parameter("mType", "pttDu")
+            parameter("voice_encodec", codec)
+            body = content
         }
     }
 }

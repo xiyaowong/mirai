@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -24,8 +24,8 @@ import kotlin.annotation.AnnotationTarget.*
     CLASS, FUNCTION, PROPERTY
 )
 @MustBeDocumented
-annotation class MiraiInternalAPI(
-    val message: String = ""
+public annotation class MiraiInternalAPI(
+    public val message: String = ""
 )
 
 /**
@@ -38,8 +38,8 @@ annotation class MiraiInternalAPI(
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @Target(CLASS, TYPEALIAS, FUNCTION, PROPERTY, FIELD, CONSTRUCTOR)
 @MustBeDocumented
-annotation class MiraiExperimentalAPI(
-    val message: String = ""
+public annotation class MiraiExperimentalAPI(
+    public val message: String = ""
 )
 
 /**
@@ -48,7 +48,9 @@ annotation class MiraiExperimentalAPI(
 @Target(CLASS, PROPERTY, FIELD, CONSTRUCTOR, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER, TYPEALIAS)
 @Retention(AnnotationRetention.BINARY)
 @MustBeDocumented
-annotation class SinceMirai(val version: String)
+public annotation class SinceMirai(
+    public val version: String
+)
 
 /**
  * 标记一个正计划在 [version] 版本时删除 (对外隐藏) 的 API.

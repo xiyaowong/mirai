@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Mamoe Technologies and contributors.
+ * Copyright 2019-2020 Mamoe Technologies and contributors.
  *
  * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
- * Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ * Use of this source code is governed by the GNU AFFERO GENERAL PUBLIC LICENSE version 3 license that can be found via the following link.
  *
  * https://github.com/mamoe/mirai/blob/master/LICENSE
  */
@@ -12,7 +12,7 @@ package net.mamoe.mirai.qqandroid.network.protocol.packet.login
 import kotlinx.io.core.ByteReadPacket
 import kotlinx.io.core.use
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.protobuf.ProtoId
+import kotlinx.serialization.protobuf.ProtoNumber
 import net.mamoe.mirai.event.AbstractEvent
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.qqandroid.QQAndroidBot
@@ -51,15 +51,15 @@ internal class ConfigPushSvc {
 
             @Serializable
             data class ChangeServer(
-                @ProtoId(1) val unknown: Int, // =08
-                @ProtoId(2) val serverList: List<ServerInfo>
+                @ProtoNumber(1) val unknown: Int, // =08
+                @ProtoNumber(2) val serverList: List<ServerInfo>
             ) : ProtoBuf, PushReqResponse() {
 
                 @Serializable
                 data class ServerInfo(
-                    @ProtoId(1) val host: String,
-                    @ProtoId(2) val port: Int,
-                    @ProtoId(3) val unknown: Int
+                    @ProtoNumber(1) val host: String,
+                    @ProtoNumber(2) val port: Int,
+                    @ProtoNumber(3) val unknown: Int
                 ) : ProtoBuf {
                     override fun toString(): String {
                         return "$host:$port"
